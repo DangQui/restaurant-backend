@@ -1,0 +1,579 @@
+{
+  "info": {
+    "_postman_id": "997a8bb2-f498-4fde-b461-64d146948aac",
+    "name": "Restaurant",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42119462"
+  },
+  "item": [
+    {
+      "name": "Menu-Item",
+      "item": [
+        {
+          "name": "Create Menu",
+          "id": "3d35cefd-a3c2-4bf7-b938-7a5fe7700795",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Cơm gà chiên\",\r\n  \"price\": 55000,\r\n  \"category\": \"lunch\",\r\n  \"type\": \"food\",\r\n  \"description\": \"Cơm gà chiên giòn\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/menu-items",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "menu-items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetAllMenu",
+          "id": "9da7c143-c03f-4dbf-b67f-a6079164e59a",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/api/menu-items",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "menu-items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetMenuById",
+          "id": "41a0720e-d97d-4204-bda3-2cf998032ffa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/api/menu-items/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "menu-items",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "10ec9f41-5309-4645-ad8b-61381ce97f71"
+    },
+    {
+      "name": "Rating",
+      "item": [
+        {
+          "name": "New Request",
+          "id": "49b18f16-4e6f-42b4-bcb6-7c1cda747e0b",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"menuItemId\": 1,\r\n    \"rating\": 4,\r\n    \"comment\": \"Ổn, nhưng hơi mặn\"\r\n  }'",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/ratings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "ratings"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "97496bb8-2cfb-4f79-acb4-a8b0a61e119a"
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "CreateOrder",
+          "id": "227039ae-97b0-4791-9886-ef82216dcf3e",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// {\r\n//   \"orderType\": \"dine-in\",\r\n//   \"tableId\": 5\r\n// }\r\n\r\n{\r\n  \"orderType\": \"delivery\",\r\n  \"userId\": 1,\r\n  \"deliveryAddress\": \"Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội\",\r\n  \"deliveryNote\": \"Gọi trước khi giao\",\r\n  \"customerName\": \"Nguyễn Tùng Lâm\",\r\n  \"customerPhone\": \"0987654321\"\r\n}\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/orders",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetOrderById",
+          "id": "33a3949d-1c97-409d-9fa4-b17c04a32434",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// {\r\n//   \"orderType\": \"dine-in\",\r\n//   \"tableId\": 5\r\n// }\r\n\r\n{\r\n  \"orderType\": \"delivery\",\r\n  \"userId\": 1,\r\n  \"deliveryAddress\": \"Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội\",\r\n  \"deliveryNote\": \"Gọi trước khi giao\",\r\n  \"customerName\": \"Nguyễn Tùng Lâm\",\r\n  \"customerPhone\": \"0987654321\"\r\n}\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/orders",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllOrder",
+          "id": "dd4f0cc8-78e6-4fcc-a9af-485301110051",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "filterDelivery",
+          "id": "06f55cdf-4b78-42dd-9c33-b4e3c5f99dc0",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "filterStatus",
+          "id": "5998402a-ecc3-4e17-b674-8a8692bc8c7b",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "filterUserId",
+          "id": "8147412c-b3fd-471d-bed6-dd20bba8bf19",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "updateStatus",
+          "id": "8656015a-b50f-4abf-9ee0-3f4cfaa8c9f0",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ],
+      "id": "01d7ed7f-c541-4592-b505-967e35d240ab"
+    },
+    {
+      "name": "OrderItem",
+      "item": [
+        {
+          "name": "addItem",
+          "id": "8773fe91-db21-4898-b858-21ac0b7fc598",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"menuItemId\": 1,\r\n  \"quantity\": 2,\r\n  \"price\": 60000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/orders-items/1/items",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "orders-items",
+                "1",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateQuantity",
+          "id": "56157cf1-c8cf-468d-9622-7c570ce210e3",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "DeleteItem",
+          "id": "b24759f7-f51e-4649-913f-1725f4edd01c",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ],
+      "id": "b2a423d6-3d9b-46d5-92c4-bddfccf91060"
+    },
+    {
+      "name": "payment",
+      "item": [
+        {
+          "name": "payment",
+          "id": "dd68b6c8-57f6-4e52-a47e-3d11ab8a343d",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "GetAllPayment",
+          "id": "0c512019-a38f-4110-8105-b1cd33a980c3",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "filter",
+          "id": "6a2e4cea-af5f-4360-97b5-78ea4f7341a4",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ],
+      "id": "5d48f34d-9172-4f9b-b84b-01f44a74f43a"
+    },
+    {
+      "name": "reservation",
+      "item": [
+        {
+          "name": "New Request",
+          "id": "7edd6455-6ada-448e-a182-7aaaa30c2316",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "booking",
+          "id": "7a4952c8-e479-4cc1-ad35-acbdec4129fd",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "GetAllReservation",
+          "id": "7a8b87fb-5db1-47c1-b05e-75dbd377bfa8",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "GetById",
+          "id": "479f0bce-07fa-4a5d-bca2-fdd335b1c126",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "FilterByStatus",
+          "id": "c1c9ba13-275f-4cf0-846b-f6311e458360",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "FilterByDate",
+          "id": "981a7f0e-5b7a-4d4a-a926-d505a5191366",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "update",
+          "id": "791b8606-0f21-40bd-af1b-cd7e3852a2e2",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"confirmed\",\r\n  \"notes\": \"Khách đã cọc 200k\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3002/api/reservations/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3002",
+              "path": [
+                "api",
+                "reservations",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "id": "800c53f6-59ba-44f3-a991-3bbe7ca9025c",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"confirmed\",\r\n  \"notes\": \"Khách đã cọc 200k\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3002/api/reservations/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3002",
+              "path": [
+                "api",
+                "reservations",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "71b28c77-77e1-4d25-a765-3ed73541dce5"
+    },
+    {
+      "name": "New Request",
+      "id": "5dcd75d9-c0e7-43d7-9754-ca310516fb2d",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"user1@example.com\",\r\n  \"password\": \"123456\",\r\n  \"name\": \"User 1\",\r\n  \"role\": \"USER\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3003/api/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3003",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "id": "2af73434-ba9f-450d-84a4-b6df5bc8ed31",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"user1@example.com\",\r\n  \"password\": \"123456\",\r\n  \"name\": \"User 1\",\r\n  \"role\": \"USER\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3003/api/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3003",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "id": "5b801f5f-aa34-4aef-918d-245f3f2ace96",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "// {\r\n//   \"email\": \"user1@example.com\",\r\n//   \"password\": \"123456\"\r\n// }\r\n\r\n{\r\n  \"email\": \"admin@system.com\",\r\n  \"password\": \"admin123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3003/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3003",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login Copy",
+      "id": "2ef66377-5a61-4f3d-a479-bc0fb29203a7",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"user1@example.com\",\r\n  \"password\": \"123456\"\r\n}\r\n\r\n// {\r\n//   \"email\": \"admin@system.com\",\r\n//   \"password\": \"admin123\"\r\n// }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:5055/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5055",
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "id": "18d81fe0-3955-46cd-82fd-a2fab7fa18d3",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
