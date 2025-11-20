@@ -1,16 +1,24 @@
-'use strict';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-module.exports = (sequelize, DataTypes) => {
-  const Cart = sequelize.define('Cart', {
-    userId: DataTypes.INTEGER,
-    status: DataTypes.STRING
-  }, {
-    tableName: 'Carts'
-  });
+const Cart = sequelize.define('Cart', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'active'
+    }
+}, {
+    tableName: 'carts',
+    timestamps: true
+});
 
-  Cart.associate = (models) => {
-    Cart.hasMany(models.CartItem, { foreignKey: 'cartId', as: 'items' });
-  };
-
-  return Cart;
-};
+module.exports = Cart;

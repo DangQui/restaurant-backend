@@ -4,44 +4,68 @@ module.exports = {
 
   // Lấy cart hoặc tự tạo
   async getCartByUser(req, res) {
-    const userId = req.params.userId;
+    try {
+      const userId = req.params.userId;
 
-    let cart = await Cart.findOne({
-      where: { userId, status: 'active' },
-      include: [{ model: CartItem, as: 'items' }]
-    });
+      let cart = await Cart.findOne({
+        where: { userId, status: 'active' },
+        include: [{ model: CartItem, as: 'items' }]
+      });
 
-    if (!cart) {
-      cart = await Cart.create({ userId });
+      if (!cart) {
+        cart = await Cart.create({ userId, status: 'active' });
+      }
+
+      res.json(cart);
+    } catch (error) {
+      console.error('getCartByUser error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get cart', 
+        message: error.message,
+        details: error.original?.message || error.message
+      });
     }
-
-    res.json(cart);
   },
 
   // Thêm item
   async addItem(req, res) {
-    const userId = req.params.userId;
-    const { menuItemId, quantity, price } = req.body;
+    try {
+      const userId = req.params.userId;
+      const { menuItemId, quantity, price } = req.body;
 
-    let cart = await Cart.findOne({ where: { userId, status: 'active' } });
-    if (!cart) cart = await Cart.create({ userId });
+      if (!menuItemId || !quantity || !price) {
+        return res.status(400).json({ error: 'menuItemId, quantity, and price are required' });
+      }
 
-    let item = await CartItem.findOne({ where: { cartId: cart.id, menuItemId } });
+      let cart = await Cart.findOne({ where: { userId, status: 'active' } });
+      if (!cart) {
+        cart = await Cart.create({ userId, status: 'active' });
+      }
 
-    if (item) {
-      item.quantity += quantity;
-      await item.save();
-      return res.json(item);
+      let item = await CartItem.findOne({ where: { cartId: cart.id, menuItemId } });
+
+      if (item) {
+        item.quantity += quantity;
+        await item.save();
+        return res.json(item);
+      }
+
+      item = await CartItem.create({
+        cartId: cart.id,
+        menuItemId,
+        quantity,
+        price
+      });
+
+      res.status(201).json(item);
+    } catch (error) {
+      console.error('addItem error:', error);
+      res.status(500).json({ 
+        error: 'Failed to add item to cart', 
+        message: error.message,
+        details: error.original?.message || error.message
+      });
     }
-
-    item = await CartItem.create({
-      cartId: cart.id,
-      menuItemId,
-      quantity,
-      price
-    });
-
-    res.status(201).json(item);
   },
 
   // Update item

@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('CartItems', {
+    await queryInterface.createTable('cart_items', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -18,10 +18,11 @@ module.exports = {
       },
       quantity: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 1
       },
       price: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
         allowNull: false
       },
       createdAt: {
@@ -36,13 +37,26 @@ module.exports = {
       }
     });
 
-    // Foreign Key
-    await queryInterface.addConstraint('CartItems', {
+    // Foreign Key: cart_items.cartId -> carts.id
+    await queryInterface.addConstraint('cart_items', {
       fields: ['cartId'],
       type: 'foreign key',
-      name: 'fk_cartitems_cartid',
+      name: 'fk_cart_items_cart_id',
       references: {
-        table: 'Carts',
+        table: 'carts',
+        field: 'id'
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+
+    // Foreign Key: cart_items.menuItemId -> menu_items.id (optional but recommended)
+    await queryInterface.addConstraint('cart_items', {
+      fields: ['menuItemId'],
+      type: 'foreign key',
+      name: 'fk_cart_items_menu_item_id',
+      references: {
+        table: 'menu_items',
         field: 'id'
       },
       onDelete: 'CASCADE',
@@ -51,8 +65,8 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.removeConstraint('CartItems', 'fk_cartitems_cartid');
-    await queryInterface.dropTable('CartItems');
+    await queryInterface.removeConstraint('cart_items', 'fk_cart_items_menu_item_id');
+    await queryInterface.removeConstraint('cart_items', 'fk_cart_items_cart_id');
+    await queryInterface.dropTable('cart_items');
   }
 };
-

@@ -6,6 +6,8 @@ const Order = require('./order');
 const OrderItem = require('./orderItem');
 const Payment = require('./payment');
 const Rating = require('./rating');
+const Cart = require('./cart');
+const CartItem = require('./cartItem');
 
 // ========== Associations ==========
 
@@ -51,35 +53,35 @@ Rating.belongsTo(MenuItem, {
     as: 'menuItem',
 });
 
-// ========== Associations MỚI cho Cart ==========
+// ========== Associations cho Cart ==========
 Cart.hasMany(CartItem, {
     foreignKey: 'cartId',
     as: 'items',
     onDelete: 'CASCADE'
-  });
-  CartItem.belongsTo(CCart, {
+});
+CartItem.belongsTo(Cart, {
     foreignKey: 'cartId',
     as: 'cart'
-  });
-  
-  // Nếu sau này bạn muốn lấy MenuItem trong CartItem (không bắt buộc nhưng tiện)
-  CartItem.belongsTo(MenuItem, {
+});
+
+// CartItem - MenuItem relationship
+CartItem.belongsTo(MenuItem, {
     foreignKey: 'menuItemId',
     as: 'menuItem'
-  });
-  MenuItem.hasMany(CartItem, {
+});
+MenuItem.hasMany(CartItem, {
     foreignKey: 'menuItemId',
     as: 'cartItems'
-  });
-  
-  // ========== Export tất cả ==========
-  module.exports = {
+});
+
+// ========== Export tất cả ==========
+module.exports = {
     sequelize,
     MenuItem,
     Order,
     OrderItem,
     Payment,
     Rating,
-    Cart,        // mới
-    CartItem     // mới
-  };
+    Cart,
+    CartItem
+};

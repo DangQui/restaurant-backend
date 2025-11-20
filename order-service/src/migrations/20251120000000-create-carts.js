@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Carts', {
+    await queryInterface.createTable('carts', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -10,10 +10,11 @@ module.exports = {
       },
       userId: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: true
       },
       status: {
         type: Sequelize.STRING,
+        allowNull: false,
         defaultValue: 'active'
       },
       createdAt: {
@@ -30,6 +31,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('Carts');
+    await queryInterface.dropTable('carts');
   }
 };
