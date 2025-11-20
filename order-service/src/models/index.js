@@ -51,12 +51,35 @@ Rating.belongsTo(MenuItem, {
     as: 'menuItem',
 });
 
-// Xuất ra cho chỗ khác dùng
-module.exports = {
+// ========== Associations MỚI cho Cart ==========
+Cart.hasMany(CartItem, {
+    foreignKey: 'cartId',
+    as: 'items',
+    onDelete: 'CASCADE'
+  });
+  CartItem.belongsTo(CCart, {
+    foreignKey: 'cartId',
+    as: 'cart'
+  });
+  
+  // Nếu sau này bạn muốn lấy MenuItem trong CartItem (không bắt buộc nhưng tiện)
+  CartItem.belongsTo(MenuItem, {
+    foreignKey: 'menuItemId',
+    as: 'menuItem'
+  });
+  MenuItem.hasMany(CartItem, {
+    foreignKey: 'menuItemId',
+    as: 'cartItems'
+  });
+  
+  // ========== Export tất cả ==========
+  module.exports = {
     sequelize,
     MenuItem,
     Order,
     OrderItem,
     Payment,
     Rating,
-};
+    Cart,        // mới
+    CartItem     // mới
+  };

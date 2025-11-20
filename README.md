@@ -16,8 +16,3 @@ docker volume prune -f
 
 docker-compose down 
 docker-compose up --build -d
-
-# TẠO + SEED DỮ LIỆU MENU MẪU
-cd order-service
-npx sequelize-cli db:migrate
-node src/seed.js
