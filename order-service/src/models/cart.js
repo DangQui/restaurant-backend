@@ -15,6 +15,27 @@ const Cart = sequelize.define('Cart', {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: 'active'
+    }, 
+    orderType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'delivery'
+    },
+    customerName: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    customerPhone: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    deliveryAddress: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    deliveryNote: {
+        type: DataTypes.TEXT,
+        allowNull: true
     }
 }, {
     tableName: 'carts',

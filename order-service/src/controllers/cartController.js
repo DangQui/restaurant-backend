@@ -1,133 +1,239 @@
-const { Cart, CartItem, Order, OrderItem } = require('../models');
+const { Cart, CartItem, MenuItem, Order, OrderItem } = require('../models');
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80';
+
+const cartInclude = [
+  {
+    model: CartItem,
+    as: 'items',
+    include: [
+      {
+        association: 'menuItem'
+      }
+    ]
+  }
+];
+
+const loadCart = async (cart) => {
+  if (!cart) return null;
+  return cart.reload({ include: cartInclude });
+};
+
+const findOrCreateCart = async (userId) => {
+  let cart = await Cart.findOne({ where: { userId, status: 'active' }, include: cartInclude });
+  if (!cart) {
+    cart = await Cart.create({ userId, status: 'active' });
+    cart = await Cart.findOne({ where: { id: cart.id }, include: cartInclude });
+  }
+  return cart;
+};
+
+const formatCart = (cart) => {
+  if (!cart) return null;
+  const plain = cart.get({ plain: true });
+  plain.items = (plain.items || [])
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    .map((item) => ({
+    ...item,
+    price: typeof item.price === 'number' ? item.price : item.menuItem?.price || 0,
+    menuItem: item.menuItem || {
+      name: `Món #${item.menuItemId}`,
+      description: 'Đang cập nhật',
+      category: 'menu',
+      imageUrl: FALLBACK_IMAGE,
+      price: item.price
+    }
+    }));
+  return plain;
+};
 
 module.exports = {
+  async ensureCartForUser(req, res) {
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+      }
+      const cart = await findOrCreateCart(userId);
+      res.status(201).json(formatCart(cart));
+    } catch (error) {
+      console.error('ensureCartForUser error:', error);
+      res.status(500).json({ error: 'Failed to ensure cart', message: error.message });
+    }
+  },
 
-  // Lấy cart hoặc tự tạo
   async getCartByUser(req, res) {
     try {
-      const userId = req.params.userId;
-
-      let cart = await Cart.findOne({
-        where: { userId, status: 'active' },
-        include: [{ model: CartItem, as: 'items' }]
-      });
-
-      if (!cart) {
-        cart = await Cart.create({ userId, status: 'active' });
-      }
-
-      res.json(cart);
+      const userId = req.user.id;
+      const cart = await findOrCreateCart(userId);
+      res.json(formatCart(cart));
     } catch (error) {
       console.error('getCartByUser error:', error);
-      res.status(500).json({ 
-        error: 'Failed to get cart', 
+      res.status(500).json({
+        error: 'Failed to get cart',
         message: error.message,
         details: error.original?.message || error.message
       });
     }
   },
 
-  // Thêm item
   async addItem(req, res) {
     try {
-      const userId = req.params.userId;
-      const { menuItemId, quantity, price } = req.body;
+      const userId = req.user.id;
+      const { menuItemId, quantity = 1, price } = req.body;
 
-      if (!menuItemId || !quantity || !price) {
-        return res.status(400).json({ error: 'menuItemId, quantity, and price are required' });
+      if (!menuItemId || quantity < 1) {
+        return res.status(400).json({ error: 'menuItemId and quantity are required' });
       }
 
-      let cart = await Cart.findOne({ where: { userId, status: 'active' } });
-      if (!cart) {
-        cart = await Cart.create({ userId, status: 'active' });
+      const menuItem = await MenuItem.findByPk(menuItemId);
+      if (!menuItem) {
+        return res.status(404).json({ error: 'Menu item not found' });
       }
+
+      const cart = await findOrCreateCart(userId);
+      const unitPrice = typeof price === 'number' ? price : menuItem.price;
 
       let item = await CartItem.findOne({ where: { cartId: cart.id, menuItemId } });
-
       if (item) {
         item.quantity += quantity;
+        item.price = unitPrice;
         await item.save();
-        return res.json(item);
+      } else {
+        await CartItem.create({
+          cartId: cart.id,
+          menuItemId,
+          quantity,
+          price: unitPrice
+        });
       }
 
-      item = await CartItem.create({
-        cartId: cart.id,
-        menuItemId,
-        quantity,
-        price
-      });
-
-      res.status(201).json(item);
+      const freshCart = await loadCart(cart);
+      res.status(201).json(formatCart(freshCart));
     } catch (error) {
       console.error('addItem error:', error);
-      res.status(500).json({ 
-        error: 'Failed to add item to cart', 
+      res.status(500).json({
+        error: 'Failed to add item to cart',
         message: error.message,
         details: error.original?.message || error.message
       });
     }
   },
 
-  // Update item
   async updateItem(req, res) {
-    const { id } = req.params;
-    const { quantity } = req.body;
+    try {
+      const { id } = req.params;
+      const { quantity } = req.body;
+      const userId = req.user.id;
 
-    const item = await CartItem.findByPk(id);
-    if (!item) return res.status(404).json({ error: 'Item not found' });
-
-    item.quantity = quantity;
-    await item.save();
-
-    res.json(item);
-  },
-
-  // Xoá item
-  async deleteItem(req, res) {
-    const { id } = req.params;
-    await CartItem.destroy({ where: { id } });
-
-    res.status(204).send();
-  },
-
-  // Checkout → tạo order
-  async checkoutFromCart(req, res) {
-    const userId = req.params.userId;
-    const { customerName, customerPhone, deliveryAddress } = req.body;
-
-    const cart = await Cart.findOne({
-      where: { userId, status: 'active' },
-      include: [{ model: CartItem, as: 'items' }]
-    });
-
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ error: 'Cart empty' });
-    }
-
-    // 1. Tạo Order
-    const order = await Order.create({
-      orderType: 'delivery',
-      customerName,
-      customerPhone,
-      deliveryAddress,
-      status: 'pending'
-    });
-
-    // 2. Add OrderItems
-    for (const it of cart.items) {
-      await OrderItem.create({
-        orderId: order.id,
-        menuItemId: it.menuItemId,
-        quantity: it.quantity,
-        price: it.price
+      const item = await CartItem.findOne({
+        where: { id },
+        include: [{ model: Cart, as: 'cart' }]
       });
+
+      if (!item || item.cart.userId !== userId) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+
+      if (!quantity || quantity < 1) {
+        await item.destroy();
+      } else {
+        item.quantity = quantity;
+        await item.save();
+      }
+
+      const cart = await findOrCreateCart(userId);
+      res.json(formatCart(cart));
+    } catch (error) {
+      console.error('updateItem error:', error);
+      res.status(500).json({ error: 'Failed to update item', message: error.message });
     }
+  },
 
-    // 3. Clear cart
-    await CartItem.destroy({ where: { cartId: cart.id } });
-    cart.status = 'converted';
-    await cart.save();
+  async deleteItem(req, res) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
 
-    res.json({ message: 'Order created', orderId: order.id });
+      const item = await CartItem.findOne({
+        where: { id },
+        include: [{ model: Cart, as: 'cart' }]
+      });
+      if (!item || item.cart.userId !== userId) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+
+      await item.destroy();
+
+      const cart = await findOrCreateCart(userId);
+      res.json(formatCart(cart));
+    } catch (error) {
+      console.error('deleteItem error:', error);
+      res.status(500).json({ error: 'Failed to delete item', message: error.message });
+    }
+  },
+
+  async updateDetails(req, res) {
+    try {
+      const userId = req.user.id;
+      const cart = await findOrCreateCart(userId);
+
+      const allowedFields = ['customerName', 'customerPhone', 'deliveryAddress', 'deliveryNote', 'orderType'];
+      allowedFields.forEach((field) => {
+        if (field in req.body) {
+          cart[field] = req.body[field];
+        }
+      });
+
+      await cart.save();
+      const freshCart = await loadCart(cart);
+      res.json(formatCart(freshCart));
+    } catch (error) {
+      console.error('updateDetails error:', error);
+      res.status(500).json({ error: 'Failed to update cart details', message: error.message });
+    }
+  },
+
+  async checkoutFromCart(req, res) {
+    try {
+      const userId = req.user.id;
+      const { customerName, customerPhone, deliveryAddress, deliveryNote, orderType } = req.body;
+
+      const cart = await Cart.findOne({
+        where: { userId, status: 'active' },
+        include: cartInclude
+      });
+
+      if (!cart || !cart.items || cart.items.length === 0) {
+        return res.status(400).json({ error: 'Cart empty' });
+      }
+
+      const order = await Order.create({
+        orderType: orderType || cart.orderType || 'delivery',
+        customerName: customerName || cart.customerName,
+        customerPhone: customerPhone || cart.customerPhone,
+        deliveryAddress: deliveryAddress || cart.deliveryAddress,
+        deliveryNote: deliveryNote || cart.deliveryNote,
+        status: 'pending'
+      });
+
+      for (const it of cart.items) {
+        await OrderItem.create({
+          orderId: order.id,
+          menuItemId: it.menuItemId,
+          quantity: it.quantity,
+          price: it.price
+        });
+      }
+
+      await CartItem.destroy({ where: { cartId: cart.id } });
+      cart.status = 'converted';
+      await cart.save();
+
+      res.json({ message: 'Order created', orderId: order.id });
+    } catch (error) {
+      console.error('checkoutFromCart error:', error);
+      res.status(500).json({ error: 'Failed to checkout cart', message: error.message });
+    }
   }
 };

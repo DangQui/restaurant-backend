@@ -30,6 +30,7 @@ services:
     environment:
       - PORT=3001
       - DATABASE_URL=postgres://postgres:postgres@postgres_db:5432/restaurantdb
+      - JWT_SECRET=your-super-secret-jwt-key-123456789
     depends_on:
       postgres_db:
         condition: service_healthy

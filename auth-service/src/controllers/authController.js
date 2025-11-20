@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserProfile = require('../models/userProfile');
 
+const { ensureUserCart } = require('../services/orderServiceClient');
+
 const generateToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_SECRET || 'fallback_secret', {
         expiresIn: process.env.JWT_EXPIRE || '7d',
@@ -32,6 +34,8 @@ exports.register = async (req, res) => {
             city: null,
             country: 'Vietnam',
         });
+
+        await ensureUserCart(user.id);
 
         const token = generateToken({ id: user.id, role: user.role });
 
